@@ -5,14 +5,14 @@ class TicTacToeWindow < Gosu::Window
   WIDTH  = 750
   HEIGHT = 500
 
-  GRID_X = 236   
-  GRID_Y = 99    
-  CELL_W = 97    
-  CELL_H = 95    
+  GRID_X = 236
+  GRID_Y = 99
+  CELL_W = 97
+  CELL_H = 95
   PIECE_SIZE = 64.0
 
-  WINS_TO_FINISH = 3 
-  END_DELAY      = 80  
+  WINS_TO_FINISH = 3
+  END_DELAY      = 80
   WIN_LINES = [[0,1,2], [3,4,5], [6,7,8], [0,3,6], [1,4,7], [2,5,8], [0,4,8], [2,4,6]]
 
   LEVELS = [
@@ -24,51 +24,43 @@ class TicTacToeWindow < Gosu::Window
   LEVEL_BTN_W = 300
   LEVEL_BTN_H = 70
 
-  TITLE_MUSIC_FILE = "music_title.mp3"  # plays on the menu, how-to and level select
-  GAME_MUSIC_FILE  = "music_game.mp3"   # plays while you play (and on the win / lose / draw screens)
-  MUSIC_VOLUME     = 0.5                # normal music volume (0.0 = silent, 1.0 = full)
-  MUSIC_TALK_VOLUME = 0.1               # music volume while Mr. Krabs is talking
-  MUSIC_FADE_STEP  = 0.03               # how fast the music fades per frame (bigger = faster)
+  TITLE_MUSIC_FILE = "music_title.mp3"
+  GAME_MUSIC_FILE  = "music_game.mp3"
+  MUSIC_VOLUME     = 0.5
+  MUSIC_TALK_VOLUME = 0.1
+  MUSIC_FADE_STEP  = 0.03
 
-  # Menu: the y position of the ground SpongeBob rests on (his bottom edge sits here).
-  # Bigger number = lower on screen. Try 360-410 to find what looks right.
   MENU_SPONGEBOB_GROUND_Y = 385
 
   BACK_BTN = [10, 5, 95, 35]
 
-  TALKER_IMAGE = "krabs.png"  
+  TALKER_IMAGE = "krabs.png"
   TALK_LINES = [
     "Ahoy, me boy! That Plankton be after me secret formula, and ye have to stop him!",
     "First, pick a level. Easy, Medium or Hard. That Plankton gets sneakier on Hard!",
     "Click a square to place yer piece. Get three in a row to win the round!",
     "Win #{WINS_TO_FINISH} rounds to finish the level. Now get to it, me boy, time is money!"
   ]
-  TALK_SPEED = 0.5                       
-  BUBBLE   = [265, 75, 460, 205]         
-  SKIP_BTN = [640, 455, 95, 35]          
+  TALK_SPEED = 0.5
+  BUBBLE   = [265, 75, 460, 205]
+  SKIP_BTN = [640, 455, 95, 35]
   TALK_TEXT_COLOR = Gosu::Color.rgb(60, 35, 10)
 
   TEXT_SIZES = { title: 70, big: 50, small: 30, tiny: 24 }
   OUTLINE_BROWN = Gosu::Color.rgb(95, 50, 10)
-  OUTLINE_GREEN = Gosu::Color.rgb(0, 110, 40)
-  OUTLINE_RED   = Gosu::Color.rgb(160, 20, 20)
-  OUTLINE_GOLD  = Gosu::Color.rgb(150, 90, 0)
-  OUTLINE_BLUE  = Gosu::Color.rgb(10, 60, 140)
   TEXT_SHADOW   = Gosu::Color.rgba(0, 0, 0, 110)
   OUTLINE_DARK  = Gosu::Color.rgb(25, 25, 50)
 
   SPONGE_TINTS = {
-    yellow: nil, green:  [90, 215, 80], red:    [240, 75, 65], blue:   [80, 175, 245],
+    yellow: nil, green:  [90, 215, 80], red:    [240, 75, 65],
     orange: [255, 160, 45], white:  [250, 250, 240]
   }
   RESULT_COLORS = {
     green:  Gosu::Color.rgb(60, 190, 90), red:    Gosu::Color.rgb(220, 60, 55),
     blue:   Gosu::Color.rgb(70, 150, 230), orange: Gosu::Color.rgb(240, 150, 40)
   }
-  SHOW_RESULT_ART = true
-  # How see-through the win / lose / draw screen is. 0 = fully clear, 255 = solid.
-  RESULT_CARD_ALPHA = 140   # the dark card behind the text (lower = more background shows)
-  RESULT_DIM_ALPHA  = 40    # the dark layer over the whole screen (0 = none)
+  RESULT_CARD_ALPHA = 140
+  RESULT_DIM_ALPHA  = 40
   OUTLINE_OFFSETS = [[3,0],[-3,0],[0,3],[0,-3],[2,2],[-2,2],[2,-2],[-2,-2],
                      [3,1],[3,-1],[-3,1],[-3,-1],[1,3],[-1,3],[1,-3],[-1,-3]]
 
@@ -95,11 +87,9 @@ class TicTacToeWindow < Gosu::Window
 
     @bg_image = load_image("bg.jpg")
     @spongebob_img = load_image("spongebob.png")
-    
-    @talker_img = File.exist?(TALKER_IMAGE) ? load_image(TALKER_IMAGE) : nil
-    puts "NOTE: #{TALKER_IMAGE} not found, using spongebob.png as the talker." unless @talker_img
-    @talker_img ||= @spongebob_img
-    
+
+    @talker_img = load_image(TALKER_IMAGE) || @spongebob_img
+
     @win_img = load_image("win.jpg")
     @lose_img = load_image("lose.jpg")
     @draw_img = load_image("draw.jpg")
@@ -108,44 +98,33 @@ class TicTacToeWindow < Gosu::Window
     @start_btn = load_image("start.png")
     @game_bg = load_image("game_bg.png")
 
-    # GAME PIECES
     @patty_img = load_image("patty.png")
     @spatula_img = load_image("spatula.png")
     @lifering_img = load_image("lifering.png")
     @bones_img = load_image("bones.png")
 
-    # Pieces are grouped by SHAPE so you never get two crossed pieces in one round:
-    #   X pool = the crossed pieces (crossed spatulas, crossed bones)
-    #   O pool = the round pieces (life ring, patty)
-    # Each round picks one from each pool.
     @x_pool = [@spatula_img, @bones_img].compact
     @o_pool = [@lifering_img, @patty_img].compact
 
-    # SFX
     @pop_snd  = load_sample("pop.wav")
     @win_snd  = load_sample("win.wav")
     @lose_snd = load_sample("lose.wav")
     @draw_snd = load_sample("draw.wav")
-    
-    # Load 4 separate Mr. Krabs audio files
+
     @talk_snds = [
       load_sample("talk1.wav"),
       load_sample("talk2.wav"),
       load_sample("talk3.wav"),
       load_sample("talk4.wav")
     ]
-    
-    # Background Music: one song for the title screens, another once the game starts.
-    # If one of the two files is missing, "music.mp3" is used for it instead.
-    fallback_song = load_song("music.mp3")
-    @title_music = load_song(TITLE_MUSIC_FILE) || fallback_song
-    @game_music  = load_song(GAME_MUSIC_FILE)  || fallback_song
+
+    @title_music = load_song(TITLE_MUSIC_FILE)
+    @game_music  = load_song(GAME_MUSIC_FILE)
     @current_music = nil
     @music_volume = MUSIC_VOLUME
 
     @state = :menu
     @global_timer = 0
-    @show_grid = false
 
     @talk_index = 0
     @talk_chars = 0.0
@@ -194,8 +173,6 @@ class TicTacToeWindow < Gosu::Window
     sound.play if sound
   end
 
-  # Plays the win / lose / draw sound and remembers it so it can be cut off
-  # (a long draw.wav no longer keeps playing into the next round).
   def play_end_sound(sound)
     stop_end_sound
     @end_channel = sound.play if sound
@@ -212,15 +189,6 @@ class TicTacToeWindow < Gosu::Window
   end
 
   def build_sponge_texture
-    if File.exist?("sponge.png")
-      begin
-        img = Gosu::Image.new("sponge.png")
-        return { w: img.width, h: img.height, px: img.to_blob.bytes }
-      rescue
-        puts "WARNING: could not read sponge.png, using the built-in sponge texture."
-      end
-    end
-
     w = 96
     h = 96
     rng = Random.new(7)
@@ -358,7 +326,7 @@ class TicTacToeWindow < Gosu::Window
   end
 
   def reset_game
-    stop_end_sound   # a new round starts: cut off any win/lose/draw sound still playing
+    stop_end_sound
     @board = ["", "", "", "", "", "", "", "", ""]
     @board_images = Array.new(9, nil)
     @turn = "X"
@@ -380,15 +348,13 @@ class TicTacToeWindow < Gosu::Window
     @state = :playing
   end
 
-  # Which song belongs to the current screen
   def music_for_state
     case @state
     when :menu, :todo, :level_select then @title_music
-    else @game_music   # :playing, :ending, :win, :lose, :draw
+    else @game_music
     end
   end
 
-  # Switches songs only when the screen changes, so a song is never restarted every frame.
   def update_music
     wanted = music_for_state
     unless wanted.equal?(@current_music)
@@ -401,7 +367,6 @@ class TicTacToeWindow < Gosu::Window
       end
     end
 
-    # Fade the music toward the volume that fits what is happening right now
     return unless @current_music
     target = music_target_volume
     diff = target - @music_volume
@@ -411,9 +376,6 @@ class TicTacToeWindow < Gosu::Window
     end
   end
 
-  # What volume the music should have right now:
-  #   silent while the win / lose / draw sound is playing,
-  #   quiet while Mr. Krabs is talking, normal otherwise.
   def music_target_volume
     return 0.0 if @end_channel && @end_channel.playing?
     return MUSIC_TALK_VOLUME if krabs_talking?
@@ -423,9 +385,9 @@ class TicTacToeWindow < Gosu::Window
   def krabs_talking?
     return false unless @state == :todo
     if @talk_instance
-      @talk_instance.playing?   # his voice clip is playing
+      @talk_instance.playing?
     else
-      talking?                  # no voice file: use the typing of the speech bubble
+      talking?
     end
   end
 
@@ -528,8 +490,7 @@ class TicTacToeWindow < Gosu::Window
     @talk_wrapped = wrap_text(TALK_LINES[index], @tiny_font, BUBBLE[2] - 36)
     @talk_total = @talk_wrapped.sum { |l| l.length + 1 }
     @talk_chars = 0.0
-    
-    # Play the specific audio file for this page
+
     if @talk_snds && @talk_snds[@talk_index]
       @talk_instance.stop if @talk_instance
       @talk_instance = @talk_snds[@talk_index].play(1.0, 1.0)
@@ -643,7 +604,6 @@ class TicTacToeWindow < Gosu::Window
     end
 
     draw_win_line if @win_line
-    draw_grid_overlay if @show_grid
 
     draw_rect(0, 0, WIDTH, 45, Gosu::Color.rgba(0, 0, 0, 150), 2)
 
@@ -673,16 +633,6 @@ class TicTacToeWindow < Gosu::Window
     plain_text_centered(score, WIDTH / 2, 462, 3, :tiny)
   end
 
-  def draw_grid_overlay
-    red = Gosu::Color::RED
-    4.times do |i|
-      x = GRID_X + i * CELL_W
-      y = GRID_Y + i * CELL_H
-      draw_line(x, GRID_Y, red, x, GRID_Y + CELL_H * 3, red, 9)
-      draw_line(GRID_X, y, red, GRID_X + CELL_W * 3, y, red, 9)
-    end
-  end
-
   def draw_win_line
     x1, y1 = cell_center(@win_line[0])
     x2, y2 = cell_center(@win_line[2])
@@ -710,9 +660,7 @@ class TicTacToeWindow < Gosu::Window
   end
 
   def draw_end_screen(image, text, tint, subtitle)
-    accent = RESULT_COLORS[tint]
-
-    if image && SHOW_RESULT_ART
+    if image
       image.draw(0, 0, 1, WIDTH.to_f / image.width, HEIGHT.to_f / image.height)
     elsif @bg_image
       @bg_image.draw(0, 0, 1, WIDTH.to_f / @bg_image.width, HEIGHT.to_f / @bg_image.height)
@@ -750,8 +698,6 @@ class TicTacToeWindow < Gosu::Window
         stop_end_sound
         @state = :menu
       end
-    elsif id == Gosu::KB_G
-      @show_grid = !@show_grid
     elsif id == Gosu::MS_LEFT
       handle_mouse_click(mouse_x, mouse_y)
     end
